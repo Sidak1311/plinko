@@ -1,77 +1,72 @@
-const Engine = Matter.Engine,
-    World = Matter.World,
-    Bodies = Matter.Bodies;
+const Engine = Matter.Engine;
+const  World = Matter.World;
+const  Events = Matter.Events;
+const  Bodies = Matter.Bodies;
+ 
+var particle;
+var plinkos = [];
+var turn=0;
+var gameState="play";
+var score=0;
 
-    var engine,world;
-    var plinkos = [];
-    var divisions = [];
-    var particles = [];
-    var divisionsHeight = 150;
+var divisionHeight=300;
 
+divisions=[];
 function setup() {
-    var canvas = createCanvas(600, 600);
-    engine = Engine.create();
-    world = engine.world;
-    ground = new Ground(599,590,1200,30);
-    for(var j = 40; j<= width; j = j+50){
-      plinkos.push(new Plinko(j , 75))
-    }
-    for(var j = 15; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,125))
-    }
-    for(var j = 40; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,175))
-    }
-    for(var j = 15; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,225))
-    }
-    for(var j = 40; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,275))
-    }
-    for(var j = 15; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,325))
-    }
-    for(var j = 40; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,375))
-    }
-    for(var j = 15; j<= width-10; j = j+50){
-      plinkos.push(new Plinko(j ,425))
-    }
-      // for(var k = 75; k<= 300; k = k+100){
-      //   plinkos.push(new Plinko(j,k))
-      // }
-    
+  createCanvas(620,700);
+ // createSprite(400, 200, 50, 50);
+  engine = Engine.create();
+  world = engine.world;
+  ground = new Ground(width/2,height,width,20);
+  
 
-   
-    for(var k = 0; k <=width; k = k+80){
-      divisions.push(new Divisions(k, height-divisionsHeight/2, 10, divisionsHeight));
+
+   for (var k = 0; k <=width; k = k + 80) {
+   divisions.push(new Divisions(k, height-divisionHeight/2, 10, divisionHeight));
+   }
+
+
+    for (var j = 75; j <=width; j=j+50) 
+    {
+       plinkos.push(new Plinko(j,75));
     }
 
-  }
+    for (var j = 50; j <=width-10; j=j+50) 
+    {  
+       plinkos.push(new Plinko(j,175));
+    }
 
+     for (var j = 75; j <=width; j=j+50) 
+    {   
+       plinkos.push(new Plinko(j,275));
+    }
+
+     for (var j = 50; j <=width-10; j=j+50) 
+    {    
+       plinkos.push(new Plinko(j,375));
+    }
  
- 
-function draw() { 
-  background("black");
-  if(frameCount % 60 === 0){
-    particle = new Particle(random(120, 500), 0, 7, random(0, 360));
-    particles.push(particle);
-  }
-   Engine.update(engine);
-
-for(var i = 0; i < particles.length; i++){
-  particles[i].display();
- }
-
-  for(var k = 0; k<divisions.length;k++){
-  divisions[k].display();
 }
-   for(var j = 0; j<plinkos.length;j++){
-    plinkos[j].display();
- }
-  ground.display();   
 
-  textSize(20);
+
+
+
+
+function draw() {
+  background(0);  
+  //drawSprites();
+ Engine.update(engine);
+ 
+ textSize(35)
+  text("Score : "+score,20,40);
+
+ if ( turn>= 5) {
+  gameState ="end";
+  textSize(60);
+  text("GameOver", 150, 250);
+}
+
+textSize(20);
 text("500",20,400);
 text("500",100,400);
 text("500",180,400);
@@ -82,5 +77,44 @@ text("200",500,400);
 text("100",580,400);
 text("100",660,400);
 text("100",740,400);
+ground.display();
+
+ for (var i = 0; i < plinkos.length; i++) {    
+  plinkos[i].display();
 }
- 
+/*
+for (var j = 0; j < particles.length; j++) { 
+  particles[j].display();
+}
+*/
+for (var k = 0; k < divisions.length; k++) {    
+  divisions[k].display();
+}
+
+
+if(particle!=null){
+ // World.add(particle,world);
+  particle.display();
+  if(particle.body.position.y>660)
+  {
+    if(particle.body.position.x<300){
+      score=score+500;
+      particle=null;
+     }
+     else if(particle.body.position.x<550 ){
+      score=score+200;
+      particle=null;
+     }
+     else if(particle.body.position.x<650 && particle.body.position.x>550 ){
+      score=score+100;
+      particle=null;
+     } 
+  }
+}
+}
+function mousePressed(){
+  if(gameState!=="end"){
+      turn = turn + 1;
+     particle=new Particle(mouseX, 10, 10); 
+  }   
+}
